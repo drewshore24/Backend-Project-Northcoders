@@ -7,6 +7,7 @@ Please run 'npm install'
 Please run 'npm i -D supertest'
 Please run 'i-D jest'
 Please run 'npm install express'
+Please run 'npm install fs'
 
 Please copy the following scripts object:
 

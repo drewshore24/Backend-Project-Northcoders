@@ -1,10 +1,12 @@
 const express = require('express')
 const app = express()
-const {getTopics} = require('../controllers/controller')
+const {getTopics, getEndpoints} = require('../controllers/controller')
 
 app.use(express.json())
 
 app.get('/api/topics', getTopics)
+
+app.get('/api', getEndpoints)
 
 app.use((err, req, res, next) => {
     if(err.status && err.msg){
@@ -12,6 +14,10 @@ app.use((err, req, res, next) => {
     }else{
         next(err)
     }
+})
+
+app.use((err, req, res, next) => {
+    res.status(500).send({msg: 'Server Error'})
 })
 
 

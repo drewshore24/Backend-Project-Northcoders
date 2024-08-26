@@ -1,4 +1,4 @@
-const { selectTopics } = require("../models/models");
+const { selectTopics, selectEndpoint } = require("../models/models");
 
 
 exports.getTopics = (req, res, next) => {
@@ -7,10 +7,18 @@ exports.getTopics = (req, res, next) => {
       res.status(200).send({ data });
     })
     .catch((err) => {
-        console.log(err,'err')
         next(err)
     })
 };
 
+exports.getEndpoints = (req, res, next) => {
+    selectEndpoint()
+    .then((data) => {
+        res.status(200).send({data});
+    })
+    .catch((err) => {
+        next(err)
+    })
+}
 
 
