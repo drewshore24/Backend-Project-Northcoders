@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const {getTopics, getEndpoints, getArticleID, getArticles, getCommentsByArtID} = require('../controllers/controller')
+const {getTopics, getEndpoints, getArticleID, getArticles, getCommentsByArtID, postComment} = require('../controllers/controller')
 
 app.use(express.json())
 
@@ -12,8 +12,9 @@ app.get('/api/articles/:article_id', getArticleID)
 
 app.get('/api/articles', getArticles)
 
-app.get('/api/artciles/:article_id/comments', getCommentsByArtID)
+app.get('/api/articles/:article_id/comments', getCommentsByArtID)
 
+app.post('/api/articles/:article_id/comments', postComment);
 
 app.use((err, req, res, next) => {
     if(err.status && err.msg){
@@ -32,7 +33,11 @@ app.use((err, req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-    res.status(500).send({msg: 'Server Error'})
+    if(err.code === '23502'){
+        res.status(400).send({msg: 'Bad Request'})
+    }else{
+        next(err)
+    }
 })
 
 

@@ -2,6 +2,7 @@ const db = require('../db/connection')
 const fs = require('fs/promises')
 const format = require('pg-format')
 const endpoint = require('../endpoints.json')
+const { articleData } = require('../db/data/test-data')
 // const {checkArticleIDExists} = require('../utils/utils')
 
 
@@ -55,7 +56,21 @@ const selectCommentsByArtID = (article_id) => {
 })
 }
 
-module.exports = {selectTopics, selectEndpoint, selectArticleID, selectArticles, selectCommentsByArtID}
+const insertComment = (article_id, newComment) => {
+    return selectArticleID(article_id).then(() => {
+    const {username, body} = newComment
+    return db
+      .query(
+        'INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;',
+        [article_id, username, body]
+      )
+      .then((result) => {
+        return result.rows[0];
+      });
+    })
+  };
+
+module.exports = {selectTopics, selectEndpoint, selectArticleID, selectArticles, selectCommentsByArtID, insertComment}
 
         // const checkID = async ({table}) => {
         //     if(!comments.length){

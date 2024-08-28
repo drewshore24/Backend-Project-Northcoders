@@ -9,7 +9,7 @@ beforeEach(() => seed(data));
 afterAll(() => db.end());
 
 describe('Endpoint Tests', () => {
-    describe('/api/topics', () => {
+    describe('GET /api/topics', () => {
         test('200: returns all data from topics when requesting all data', () => {
             return request(app).get('/api/topics').expect(200).then(({body}) => {
                 body.data.forEach(topics =>{
@@ -24,7 +24,7 @@ describe('Endpoint Tests', () => {
             })
         })
     })
-    describe('/api', () => {
+    describe('GET /api', () => {
         test('200: get 200 response', () => {
             return request(app).get('/api').expect(200)
         })
@@ -39,7 +39,7 @@ describe('Endpoint Tests', () => {
             })
         })
     })
-    describe('/api/articles/:article_id', () => {
+    describe('GET /api/articles/:article_id', () => {
         test('200: responds with ride object that matches paramentic ID given', () => {
             return request(app).get('/api/articles/1').expect(200)
             .then(({body}) => {
@@ -71,7 +71,7 @@ describe('Endpoint Tests', () => {
               });
           });
     })
-    describe('/api/articles/', () => {
+    describe('GET /api/articles/', () => {
         test('200: response with an articles array f article object, which should contain all collumns except body, and be in data descending order', () => {
             return request(app).get('/api/articles').expect(200)
             .then(({body}) => {
@@ -91,9 +91,9 @@ describe('Endpoint Tests', () => {
                 })
             })
         })
-        describe('/api/articles/:article_id/comments', () => {
+        describe('GET /api/articles/:article_id/comments', () => {
             test('200: an array of comments for the given article_id of which each comment should have comment_id, votes, created_at, author, body, article_id', () => {
-                return request(app).get('/api/artciles/9/comments').expect(200)
+                return request(app).get('/api/articles/9/comments').expect(200)
                 .then(({body}) => {
                     expect(Array.isArray(body.data))
                     expect(body.data).toBeSortedBy('created_at', {descending: true})
@@ -108,25 +108,67 @@ describe('Endpoint Tests', () => {
                 })
             })
             test('GET:200', () => {
-                return request(app).get('/api/artciles/2/comments').expect(200)
+                return request(app).get('/api/articles/2/comments').expect(200)
                 .then(({body}) => {
                     expect(body.data).toEqual([])
                 });
             });
             test('GET:400 sends an appropriate status and error message when given an invalid path', () => {
-                return request(app).get('/api/artciles/not-a-number/comments').expect(400)
+                return request(app).get('/api/articles/not-a-number/comments').expect(400)
                 .then((response) => {
                     expect(response.body.msg).toBe('Bad Request')
                 });
             });
             test('GET:404 responds with an appropriate status and error message when given a non-existent id', () => {
                 return request(app)
-                  .get('/api/artciles/999999/comments')
+                  .get('/api/articles/999999/comments')
                   .expect(404)
                   .then((response) => {
                     expect(response.body.msg).toBe('article ID does not exist');
                   });
               });
         })
+        
     })
+    describe('POST /api/articles/:article_id/comments', () => {
+        test('POST:201 takes an article id and inserts a new comment to the db and responds with the posted comment', () => {
+            const newComment = {
+              username: 'butter_bridge',
+              body: 'This is a test'
+            };
+            return request(app)
+              .post('/api/articles/4/comments')
+              .send(newComment)
+              .expect(201)
+              .then((response) => {
+                expect(response.body.comment.article_id).toBe(4);
+                expect(response.body.comment.author).toBe('butter_bridge');
+                expect(response.body.comment.body).toBe('This is a test');
+              });
+          });
+          test('POST:400 responds with an appropriate status and error message when not provided adeqaute data', () => {
+            return request(app)
+              .post('/api/articles/4/comments')
+              .send({
+                body: 'This is a test'
+              })
+              .expect(400)
+              .then((response) => {
+                expect(response.body.msg).toBe('Bad Request');
+              });
+          });
+          test.only('POST:404 responds with an appropriate status and error message when given a non-existent id', () => {
+            const newComment = {
+                username: 'butter_bridge',
+                body: 'This is a test'
+              };
+            return request(app)
+              .post('/api/articles/999999/comments')
+              .send(newComment)
+              .expect(404)
+              .then((response) => {
+                expect(response.body.msg).toBe('article ID does not exist');
+              });
+          });
+        });
 })
