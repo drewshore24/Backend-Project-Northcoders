@@ -157,7 +157,7 @@ describe('Endpoint Tests', () => {
                 expect(response.body.msg).toBe('Bad Request');
               });
           });
-          test.only('POST:404 responds with an appropriate status and error message when given a non-existent id', () => {
+          test('POST:404 responds with an appropriate status and error message when given a non-existent id', () => {
             const newComment = {
                 username: 'butter_bridge',
                 body: 'This is a test'
@@ -171,4 +171,48 @@ describe('Endpoint Tests', () => {
               });
           });
         });
+        describe('PATCH /api/articles/:article_id', () => {
+            test('200: updates article.votes by reciveing object and article id, then responds to client with updated article', () => {
+                const update = {inc_votes: 50}
+                return request(app)
+                .patch('/api/articles/1')
+                .send(update)
+                .expect(200)
+                .then(({body}) => {
+                    expect(body.updatedArticle).toBeInstanceOf(Object)
+                    expect(body.updatedArticle.votes).toBe(150)
+                    })
+                })
+             test('200: if article does not have votes, updates and returns article', () => {
+                const update = {inc_votes: 50}
+                return request(app)
+                .patch('/api/articles/2')
+                .send(update)
+                .expect(200)
+                .then(({body}) => {
+                    expect(body.updatedArticle).toBeInstanceOf(Object)
+                    expect(body.updatedArticle.votes).toBe(50)
+                    })
+                })
+                test('PATCH:400 responds with an appropriate status and error message when not provided adeqaute data', () => {
+                    const update = {inc_votes: 'string'}
+                    return request(app)
+                      .patch('/api/articles/4')
+                      .send(update)
+                      .expect(400)
+                      .then((response) => {
+                        expect(response.body.msg).toBe('Bad Request');
+                      });
+                  });
+                  test('PATCH:404 responds with an appropriate status and error message when given a non-existent id', () => {
+                    const update = {inc_votes: 50}
+                    return request(app)
+                      .patch('/api/articles/999999')
+                      .send(update)
+                      .expect(404)
+                      .then((response) => {
+                        expect(response.body.msg).toBe('article ID does not exist');
+                      });
+                  });
+            })
 })
