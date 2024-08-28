@@ -67,17 +67,17 @@ describe('Endpoint Tests', () => {
               .get('/api/articles/9999')
               .expect(404)
               .then((response) => {
-                expect(response.body.msg).toBe('article does not exist');
+                expect(response.body.msg).toBe('article ID does not exist');
               });
           });
     })
     describe('/api/articles/', () => {
-        test.only('200: response with an articles array of article object, which should contain all collumns except body, and be in data descending order', () => {
+        test('200: response with an articles array f article object, which should contain all collumns except body, and be in data descending order', () => {
             return request(app).get('/api/articles').expect(200)
             .then(({body}) => {
-                console.log(body.data, 'in test')
                 expect(body.data).toHaveLength(13)
                 expect(Array.isArray(body.data))
+                expect(body.data).toBeSortedBy('created_at', {descending: true})
                 body.data.forEach((article) => {
                     expect(article).toHaveProperty('author', expect.any(String))
                     expect(article).toHaveProperty('title', expect.any(String))
@@ -91,12 +91,42 @@ describe('Endpoint Tests', () => {
                 })
             })
         })
-        test('GET:400 sends an appropriate status and error message when given an invalid path', () => {
-            return request(app).get('/api/articlez').expect(400)
-            .expect(400)
-            .then((response) => {
-                expect(response.body.msg).toBe('Bad Request')
+        describe('/api/articles/:article_id/comments', () => {
+            test('200: an array of comments for the given article_id of which each comment should have comment_id, votes, created_at, author, body, article_id', () => {
+                return request(app).get('/api/artciles/9/comments').expect(200)
+                .then(({body}) => {
+                    expect(Array.isArray(body.data))
+                    expect(body.data).toBeSortedBy('created_at', {descending: true})
+                    body.data.forEach((comment) => {
+                        expect(comment).toHaveProperty('author', expect.any(String))
+                        expect(comment).toHaveProperty('article_id', expect.any(Number))
+                        expect(comment).toHaveProperty('comment_id', expect.any(Number))
+                        expect(comment).toHaveProperty('created_at', expect.any(String))
+                        expect(comment).toHaveProperty('votes', expect.any(Number))
+                        expect(comment).toHaveProperty('body', expect.any(String))
+                    })
+                })
+            })
+            test('GET:200', () => {
+                return request(app).get('/api/artciles/2/comments').expect(200)
+                .then(({body}) => {
+                    expect(body.data).toEqual([])
+                });
             });
-        });
+            test('GET:400 sends an appropriate status and error message when given an invalid path', () => {
+                return request(app).get('/api/artciles/not-a-number/comments').expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe('Bad Request')
+                });
+            });
+            test('GET:404 responds with an appropriate status and error message when given a non-existent id', () => {
+                return request(app)
+                  .get('/api/artciles/999999/comments')
+                  .expect(404)
+                  .then((response) => {
+                    expect(response.body.msg).toBe('article ID does not exist');
+                  });
+              });
+        })
     })
 })
