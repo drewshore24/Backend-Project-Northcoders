@@ -70,10 +70,17 @@ const insertComment = (article_id, newComment) => {
     })
   };
 
-module.exports = {selectTopics, selectEndpoint, selectArticleID, selectArticles, selectCommentsByArtID, insertComment}
 
-        // const checkID = async ({table}) => {
-        //     if(!comments.length){
-        //         await checkArticleIDExists('')
-        //     }
-        // }
+const updateArticle = (article_id, votes) => {
+    return selectArticleID(article_id).then(() => {
+    const {inc_votes} = votes
+    return db
+      .query('UPDATE articles SET votes = votes + $2 WHERE article_id = $1 RETURNING *', [article_id, inc_votes]
+      )
+      .then((result) => {
+        return result.rows[0]
+      })
+    })
+}
+
+module.exports = {selectTopics, selectEndpoint, selectArticleID, selectArticles, selectCommentsByArtID, insertComment, updateArticle}
