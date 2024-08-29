@@ -43,7 +43,8 @@ exports.getArticleID = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  selectArticles()
+  const {sort_by, order} = req.query;
+    selectArticles(sort_by, order)
     .then((data) => {
       res.status(200).send({ data });
     })

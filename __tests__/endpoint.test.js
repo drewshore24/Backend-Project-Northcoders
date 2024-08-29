@@ -281,4 +281,23 @@ describe("GET /api/users", () => {
       });
   });
 });
+describe("GET /api/articles (sorting queries)", () => {
+  test("200: accept a sort_by query, and order response by the given column name and given order (ASC/DESC)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.data).toBeSortedBy('title', {descending: false})
+      });
+  });
+  test("400: reject if sort_by value is not valid", () => {
+    return request(app)
+      .get("/api/articles?sort_by=thisisnotvalid&order=asc")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request');
+      });
+    // note for review - I was going to test regarding defaults that i have added if not arugment is given for sort_by or desc, however the default is passing as the previous describe block "GET /api/articles/" would fail otherwise. 
+  });
+});
 });
