@@ -7,7 +7,8 @@ const {
   insertComment,
   updateArticle,
   selectCommentID,
-  removeComment
+  removeComment,
+  selectUsers
 } = require("../models/models");
 
 exports.getTopics = (req, res, next) => {
@@ -105,4 +106,14 @@ exports.deleteComment = (req, res, next) => {
   .catch((err) => {
     next(err);
   });
+};
+
+exports.getUsers = (req, res, next) => {
+  selectUsers()
+    .then((data) => {
+      res.status(200).send({ data });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

@@ -105,4 +105,11 @@ const removeComment = (comment_id) => {
         })
 }
 
-module.exports = {selectTopics, selectEndpoint, selectArticleID, selectArticles, selectCommentsByArtID, insertComment, updateArticle, removeComment, selectCommentID}
+const selectUsers = () => {
+  return db
+  .query("SELECT * FROM users")
+  .then((data) => {
+      return data.rows
+  })
+}
+module.exports = {selectTopics, selectEndpoint, selectArticleID, selectArticles, selectCommentsByArtID, insertComment, updateArticle, removeComment, selectCommentID, selectUsers}
