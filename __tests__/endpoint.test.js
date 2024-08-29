@@ -259,4 +259,26 @@ describe("Endpoint Tests", () => {
           .expect(404)
       });
 })
+describe("GET /api/users", () => {
+  test("200: returns all data from users when requesting all data", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        body.data.forEach((users) => {
+          expect(typeof users.username).toBe("string");
+          expect(typeof users.name).toBe("string");
+          expect(typeof users.avatar_url).toBe("string");
+        });
+      });
+  });
+  test("404: get 404 response", () => {
+    return request(app)
+      .get("/api/userz")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(undefined);
+      });
+  });
+});
 });
