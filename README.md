@@ -8,6 +8,8 @@ Please run 'npm i -D supertest'
 Please run 'i-D jest'
 Please run 'npm install express'
 Please run 'npm install fs'
+Please run 'npm install pg'
+Please run 'npm install dotenv'
 
 Please copy the following scripts object:
 
