@@ -35,9 +35,22 @@ const selectArticleID = (id) => {
     })
 }
 
-const selectArticles = () => {
+const selectArticles = (sort_by, order) => {
+  if(sort_by === undefined){
+    sort_by = 'created_at'
+  }
+  if(order === undefined){
+    order = 'DESC'
+  }
+  let queryStr = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT (comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id"
+  const queryValues = []
+  const validColumns = [ 'author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url'];
+  if(!validColumns.includes(sort_by)){
+    return Promise.reject({status: 400, msg: 'Bad Request'})
+  }
+  else{ queryStr += ` ORDER BY articles.${sort_by} ${order}`}
     return db
-    .query("SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT (comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY articles.created_at DESC")
+    .query(queryStr,queryValues)
     .then((data) => {
         return data.rows
     })
