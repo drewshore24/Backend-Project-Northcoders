@@ -25,5 +25,101 @@
         }
       ]
     }
+  },
+  "GET api/articles/:article_id": {
+    "description": "responds with ride object that matches paramentic ID given",
+    "queries": ["author", "topic", "sort_by", "order"],
+    "exampleResponse": {
+      "articles": [
+        {
+          "title": "Living in the shadow of a great man",
+          "topic": "mitch",
+          "author": "butter_bridge",
+          "body": "I find this existence challenging",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 100,
+          "article_img_url":
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        }
+      ]
+    } 
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "",
+    "exampleResponse for /api/articles/9/comments": {
+      "comments": [
+        {
+          "comment_id": 1,
+          "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          "article_id": 9,
+          "author": "butter_bridge",
+          "votes": 16,
+          "created_at": "2020-04-06T12:17:00.000Z"
+        },
+        {
+          "comment_id": 17,
+          "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          "article_id": 9,
+          "author": "icellusedkars",
+          "votes": 20,
+          "created_at": "2020-03-14T17:02:00.000Z"
+        }
+      ]
+    }
+  },
+  "post /api/articles/:article_id/comments": {
+    "description": "takes an article id and inserts a new comment to the db and responds with the posted comment",
+    "example response to /api/articles/4/comments": {
+      "comment_id": 19,
+      "body": "This is a test",
+      "article_id": 4,
+      "author": "butter_bridge",
+      "votes": 0,
+      "created_at": "2024-08-30T10:51:44.051Z"
+    }
+  },
+  "patch /api/articles/:article_id": {
+    "description": "updates article.votes by reciveing object and article id, then responds to client with updated article",
+    "exampleResponse to /api/articles/1": 
+        {
+          "article_id": 1,
+          "title": "Living in the shadow of a great man",
+          "topic": "mitch",
+          "author": "butter_bridge",
+          "body": "I find this existence challenging",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 150,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "delete given comment by comment_id and response with status 204 and no content"
+  },
+  "/api/users": {
+    "description": "returns all data from users when requesting all data",
+    "exampleResponse": {
+      "user":   [
+        {
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "username": "icellusedkars",
+          "name": "sam",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        },
+        {
+          "username": "rogersop",
+          "name": "paul",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        },
+        {
+          "username": "lurker",
+          "name": "do_nothing",
+          "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+        }
+      ]
+    }
   }
 }
