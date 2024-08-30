@@ -243,61 +243,73 @@ describe("Endpoint Tests", () => {
   });
   describe("DELETE /api/comments/:comment_id", () => {
     test("204: delete given comment by comment_id and response with status 204 and no content", () => {
-      return request(app)
-        .delete("/api/comments/1")
-        .expect(204)
+      return request(app).delete("/api/comments/1").expect(204);
     });
     test("DELETE:400 responds with an appropriate status and error message when not provided adeqaute data", () => {
-        return request(app)
-          .delete("/api/comments/not-a-number")
-          .expect(400)
-      });
-      test("DELETE:404 responds with an appropriate status and error message when given a non-existent id", () => {
-        const update = { inc_votes: 50 };
-        return request(app)
-          .delete("/api/comments/999999")
-          .expect(404)
-      });
-})
-describe("GET /api/users", () => {
-  test("200: returns all data from users when requesting all data", () => {
-    return request(app)
-      .get("/api/users")
-      .expect(200)
-      .then(({ body }) => {
-        body.data.forEach((users) => {
-          expect(typeof users.username).toBe("string");
-          expect(typeof users.name).toBe("string");
-          expect(typeof users.avatar_url).toBe("string");
+      return request(app).delete("/api/comments/not-a-number").expect(400);
+    });
+    test("DELETE:404 responds with an appropriate status and error message when given a non-existent id", () => {
+      const update = { inc_votes: 50 };
+      return request(app).delete("/api/comments/999999").expect(404);
+    });
+  });
+  describe("GET /api/users", () => {
+    test("200: returns all data from users when requesting all data", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          body.data.forEach((users) => {
+            expect(typeof users.username).toBe("string");
+            expect(typeof users.name).toBe("string");
+            expect(typeof users.avatar_url).toBe("string");
+          });
         });
-      });
+    });
+    test("404: get 404 response", () => {
+      return request(app)
+        .get("/api/userz")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe(undefined);
+        });
+    });
   });
-  test("404: get 404 response", () => {
-    return request(app)
-      .get("/api/userz")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe(undefined);
-      });
+  describe("GET /api/articles (sorting queries)", () => {
+    test("200: accept a sort_by query, and order response by the given column name and given order (ASC/DESC)", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.data).toBeSortedBy("title", { descending: false });
+        });
+    });
+    test("400: reject if sort_by value is not valid", () => {
+      return request(app)
+        .get("/api/articles?sort_by=thisisnotvalid&order=asc")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+      // note for review - I was going to test regarding defaults that i have added if not arugment is given for sort_by or desc, however the default is passing as the previous describe block "GET /api/articles/" would fail otherwise.
+    });
   });
-});
-describe("GET /api/articles (sorting queries)", () => {
-  test("200: accept a sort_by query, and order response by the given column name and given order (ASC/DESC)", () => {
-    return request(app)
-      .get("/api/articles?sort_by=title&order=asc")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.data).toBeSortedBy('title', {descending: false})
-      });
+  describe("GET /api/articles (topic queries)", () => {
+    test("200: should filter by given topic value and return matching topic values", () => {
+      return request(app)
+        .get("/api/articles?sort_by=topic&topicvalue=cats")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.data).toBeSortedBy("topic", { descending: true });
+        });
+    });
+    test("400: reject if topic value is not valid", () => {
+      return request(app)
+        .get("/api/articles?sort_by=topic&topicvalue=imnotreal")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
   });
-  test("400: reject if sort_by value is not valid", () => {
-    return request(app)
-      .get("/api/articles?sort_by=thisisnotvalid&order=asc")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('Bad Request');
-      });
-    // note for review - I was going to test regarding defaults that i have added if not arugment is given for sort_by or desc, however the default is passing as the previous describe block "GET /api/articles/" would fail otherwise. 
-  });
-});
 });
