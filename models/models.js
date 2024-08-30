@@ -2,8 +2,7 @@ const db = require("../db/connection");
 const fs = require("fs/promises");
 const format = require("pg-format");
 const endpoint = require("../endpoints.json");
-const { articleData } = require("../db/data/test-data");
-// const {checkArticleIDExists} = require('../utils/utils')
+const {articleData} = require('../db/data/test-data/index')
 
 const selectTopics = () => {
   return db.query("SELECT * FROM topics").then((data) => {
@@ -33,7 +32,17 @@ const selectArticleID = (id) => {
 };
 
 const selectArticles = (sort_by, order, topicvalue) => {
-  const sanatizedtopicValues = ["mitch", "cats"];
+  const sanatizedtopicValues = [];
+  const sanatizedColumns = [
+  ];
+  articleData.forEach((article) => {
+    sanatizedtopicValues.push(article.topic)
+  })
+  articleData.forEach((article) => {
+    for (key in article){
+      sanatizedColumns.push(key)
+    } 
+  })
   if (sort_by === undefined) {
     sort_by = "created_at";
   }
@@ -50,16 +59,7 @@ const selectArticles = (sort_by, order, topicvalue) => {
     queryStr += sql;
   }
   queryStr += " GROUP BY articles.article_id";
-  const validColumns = [
-    "author",
-    "title",
-    "article_id",
-    "topic",
-    "created_at",
-    "votes",
-    "article_img_url",
-  ];
-  if (!validColumns.includes(sort_by)) {
+  if (!sanatizedColumns.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Bad Request" });
   } else {
     queryStr += ` ORDER BY articles.${sort_by} ${order}`;
