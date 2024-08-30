@@ -56,7 +56,7 @@ describe("Endpoint Tests", () => {
       return request(app)
         .get("/api/articles/1")
         .expect(200)
-        .then(({ body }) => {
+        .then(({ body }) => {     
           expect(body.data).toMatchObject({
             title: "Living in the shadow of a great man",
             topic: "mitch",
@@ -312,4 +312,24 @@ describe("Endpoint Tests", () => {
         });
     });
   });
+  describe("GET /api/articles/:article_id (comment_count)", () => {
+    test("200: article response object should now include comment_count", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {    
+          expect(body.data).toMatchObject({
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 100,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: '1'
+          });
+        });
+    });
+  })
 });
